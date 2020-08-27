@@ -1,6 +1,31 @@
+<img src="./kronecker.png" width="650px"></img>
+
 ## Kronecker Attention Pytorch
 
-Implementation of Kronecker Attention in Pytorch
+Implementation of <a href="https://arxiv.org/abs/2007.08442">Kronecker Attention</a> in Pytorch
+
+## Install
+
+```bash
+$ pip install kronecker_attention_pytorch
+```
+
+## Usage
+
+```python
+import torch
+from kronecker_attention_pytorch import KroneckerSelfAttention
+
+x = torch.randn(1, 32, 256, 512)
+
+attn = KroneckerSelfAttention(
+    chan = 32,
+    heads = 8,
+    dim_heads = 64
+)
+
+attn(x) # (1, 32, 256, 512)
+```
 
 ## Citations
 
