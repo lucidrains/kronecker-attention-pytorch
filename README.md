@@ -2,7 +2,7 @@
 
 ## Kronecker Attention Pytorch
 
-Implementation of <a href="https://arxiv.org/abs/2007.08442">Kronecker Attention</a> in Pytorch.
+Implementation of <a href="https://arxiv.org/abs/2007.08442">Kronecker Attention</a> in Pytorch. Results look less than stellar, but if someone found some context where this architecture works well, please post in the issues and let everyone know.
 
 ## Install
 
