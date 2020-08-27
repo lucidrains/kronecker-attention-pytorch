@@ -6,7 +6,6 @@ import torch.nn.functional as F
 class KroneckerSelfAttention(nn.Module):
     def __init__(self, dim, heads, dim_heads = 32):
         super().__init__()
-        assert dim % heads == 0, 'dimension must be divisible by number of heads'
         hidden_dim = heads * dim_heads
 
         self.heads = heads
