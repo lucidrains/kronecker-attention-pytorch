@@ -13,13 +13,12 @@ class KroneckerSelfAttention(nn.Module):
         self.to_out = nn.Linear(hidden_dim, dim)
 
     def forward(self, x):
-        h = x.shape[-2]
+        _, _, h, _ = x.shape
 
         x = torch.cat((x.mean(dim=-1), x.mean(dim=-2)), dim=-1)
         x = rearrange(x, 'b c n -> b n c')
 
-        q, k, v = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), (q, k, v))
+        q, k, v = rearrange(self.to_qkv(x), 'b n (kqv h d) -> kqv b h n d', h=self.heads, kqv=3)
         
         dots = einsum('bhid,bhjd->bhij', q, k)
         attn = dots.softmax(dim=-1)
@@ -30,5 +29,5 @@ class KroneckerSelfAttention(nn.Module):
         out = rearrange(out, 'b n c -> b c n')
 
         # outer sum
-        out = out[..., :h][..., :, None] + out[..., h:][..., None, :]
+        out = rearrange(out[..., :h], 'b c n -> b c n 1') + rearrange(out[..., h:], 'b c n -> b c 1 n')
         return out
