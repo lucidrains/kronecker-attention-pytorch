@@ -17,8 +17,8 @@ class KroneckerSelfAttention(nn.Module):
 
         x = torch.cat((x.mean(dim=-1), x.mean(dim=-2)), dim=-1)
 
-        q, k, v = self.to_qkv(x).chunk(3, dim=1)
-        q, k, v = map(lambda t: rearrange(t, 'b (h d) n -> b h d n', h=self.heads), (q, k, v))
+        qkv = self.to_qkv(x)
+        q, k, v = rearrange(qkv, 'b (qkv h d) n -> qkv b h d n', h=self.heads, qkv=3)
         
         dots = einsum('bhdi,bhdj->bhij', q, k)
         attn = dots.softmax(dim=-1)
