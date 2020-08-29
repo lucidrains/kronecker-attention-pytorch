@@ -9,25 +9,23 @@ class KroneckerSelfAttention(nn.Module):
         hidden_dim = heads * dim_heads
 
         self.heads = heads
-        self.to_qkv = nn.Linear(dim, hidden_dim * 3, bias = False)
-        self.to_out = nn.Linear(hidden_dim, dim)
+        self.to_qkv = nn.Conv1d(dim, hidden_dim * 3, 1, bias = False)
+        self.to_out = nn.Conv1d(hidden_dim, dim, 1)
 
     def forward(self, x):
         h = x.shape[-2]
 
         x = torch.cat((x.mean(dim=-1), x.mean(dim=-2)), dim=-1)
-        x = rearrange(x, 'b c n -> b n c')
 
-        q, k, v = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), (q, k, v))
+        q, k, v = self.to_qkv(x).chunk(3, dim=1)
+        q, k, v = map(lambda t: rearrange(t, 'b (h d) n -> b h d n', h=self.heads), (q, k, v))
         
-        dots = einsum('bhid,bhjd->bhij', q, k)
+        dots = einsum('bhdi,bhdj->bhij', q, k)
         attn = dots.softmax(dim=-1)
-        out = einsum('bhij,bhjd->bhid', attn, v)
+        out = einsum('bhij,bhdj->bhdi', attn, v)
         
-        out = rearrange(out, 'b h n d -> b n (h d)')
+        out = rearrange(out, 'b h d n -> b (h d) n')
         out = self.to_out(out)
-        out = rearrange(out, 'b n c -> b c n')
 
         # outer sum
         out = out[..., :h][..., :, None] + out[..., h:][..., None, :]
