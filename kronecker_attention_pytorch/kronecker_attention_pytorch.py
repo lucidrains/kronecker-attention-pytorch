@@ -1,6 +1,6 @@
 import torch
 from torch import nn, einsum
-from einops import rearrange
+from einops import rearrange, repeat
 import torch.nn.functional as F
 
 class KroneckerSelfAttention(nn.Module):
@@ -28,5 +28,5 @@ class KroneckerSelfAttention(nn.Module):
         out = self.to_out(out)
 
         # outer sum
-        out = rearrange(out[..., :h], 'b c (n a) -> b c n a', a=1) + rearrange(out[..., h:], 'b c (a n) -> b c a n', a=1)
+        out = rearrange(out[..., :h], 'b c (n 1) -> b c n 1') + rearrange(out[..., h:], 'b c (1 n) -> b c 1 n')
         return out

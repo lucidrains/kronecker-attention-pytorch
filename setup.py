@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
   name = 'kronecker-attention-pytorch',
   packages = find_packages(),
-  version = '0.0.5',
+  version = '0.0.6',
   license='MIT',
   description = 'Kronecker Attention - Pytorch',
   author = 'Phil Wang',
@@ -15,7 +15,7 @@ setup(
   ],
   install_requires=[
     'torch',
-    'einops'
+    'einops>=0.3'
   ],
   classifiers=[
     'Development Status :: 4 - Beta',
